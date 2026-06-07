@@ -34,7 +34,6 @@ class TestLoginForm:
             self.get_driver().find_element(*self._PASSWORD_INPUT).send_keys("")
             self.get_driver().find_element(*self._SUBMIT_BUTTON).click()
             error_message = self.get_driver().find_element(*self._STATUS_MESSAGE).text
-            time.sleep(5)
 
             assert "Password is required (minimum 6 characters)" in error_message
             print("Тест пройден успешно!")
@@ -50,7 +49,6 @@ class TestLoginForm:
             self.get_driver().find_element(*self._PASSWORD_INPUT).send_keys("password123")
             self.get_driver().find_element(*self._SUBMIT_BUTTON).click()
             error_message = self.get_driver().find_element(*self._STATUS_MESSAGE).text
-            time.sleep(5)
 
             assert "Login is required (minimum 3 characters)" in error_message
             print("Тест пройден успешно!")
