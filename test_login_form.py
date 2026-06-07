@@ -13,10 +13,8 @@ class TestLoginForm:
     _SUBMIT_BUTTON  = (By.ID, "submit-button")
     _STATUS_MESSAGE = (By.ID, "error-message")
 
-
     def get_driver(self):
         return self.__driver
-
 
     def set_up(self):
         self.__driver = webdriver.Chrome()
@@ -55,6 +53,3 @@ class TestLoginForm:
 
         finally:
             self.teardown()
-
-
-
