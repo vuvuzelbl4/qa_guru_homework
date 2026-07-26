@@ -1,7 +1,7 @@
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as es
+from selenium.webdriver.support.ui import WebDriverWait
 
 
 class TextBoxPage:
@@ -10,7 +10,7 @@ class TextBoxPage:
     def __init__(self, driver):
         self.driver = driver
         self.wait = WebDriverWait(driver, 10)
-        self.output_wait = WebDriverWait(driver, 3)
+        self.output_wait = WebDriverWait(driver, 5)
         self.FULL_NAME_INPUT = (By.ID, "userName")
         self.EMAIL_INPUT = (By.ID, "userEmail")
         self.CURRENT_ADDRESS_INPUT = (By.ID, "currentAddress")
@@ -24,6 +24,12 @@ class TextBoxPage:
 
     def open(self):
         self.driver.get(self.URL)
+        return self
+
+    def _send_keys(self, locator, text):
+        element = self.wait.until(es.visibility_of_element_located(locator))
+        element.clear()
+        element.send_keys(text)
 
     def enter_full_name(self, name):
         self.wait.until(es.visibility_of_element_located(self.FULL_NAME_INPUT)).send_keys(name)
@@ -32,8 +38,8 @@ class TextBoxPage:
         self.wait.until(es.visibility_of_element_located(self.EMAIL_INPUT)).send_keys(email)
 
     def fill_addresses(self, current_addr, perm_addr):
-        self.driver.find_element(*self.CURRENT_ADDRESS_INPUT).send_keys(current_addr)
-        self.driver.find_element(*self.PERMANENT_ADDRESS_INPUT).send_keys(perm_addr)
+        self._send_keys(self.CURRENT_ADDRESS_INPUT, current_addr)
+        self._send_keys(self.PERMANENT_ADDRESS_INPUT, perm_addr)
 
     def click_submit(self):
         self.wait.until(es.element_to_be_clickable(self.SUBMIT_BUTTON)).click()
@@ -43,6 +49,7 @@ class TextBoxPage:
         self.enter_email(email)
         self.fill_addresses(current_addr, perm_addr)
         self.click_submit()
+        return self
 
     def get_output_name(self) -> str:
         self.output_wait.until(es.visibility_of_element_located(self.OUTPUT_BLOCK))
@@ -70,3 +77,9 @@ class TextBoxPage:
             return True
         except TimeoutException:
             return False
+
+    def get_raw_output_name(self) -> str:
+        self.output_wait.until(es.visibility_of_element_located(self.OUTPUT_BLOCK))
+        element = self.driver.find_element(*self.OUTPUT_NAME)
+        full_text = element.get_attribute("textContent")
+        return full_text.replace("Name:", "", 1)
