@@ -1,9 +1,12 @@
+import allure
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as es
 from selenium.webdriver.support.ui import WebDriverWait
 
 
+@allure.epic("Форма TextBox")
+@allure.feature("Заполнение и отправка формы")
 class TextBoxPage:
     URL = "https://qa-guru.github.io/one-page-form/text-box.html"
 
@@ -22,28 +25,35 @@ class TextBoxPage:
         self.OUTPUT_CURRENT_ADDRESS = (By.CSS_SELECTOR, "#output #currentAddress")
         self.OUTPUT_PERMANENT_ADDRESS = (By.CSS_SELECTOR, "#output #permanentAddress")
 
+    @allure.step("Открываем страницу TextBox")
     def open(self):
         self.driver.get(self.URL)
         return self
 
+    @allure.step("Вводим текст в поле")
     def _send_keys(self, locator, text):
         element = self.wait.until(es.visibility_of_element_located(locator))
         element.clear()
         element.send_keys(text)
 
+    @allure.step("Вводим полное имя: '{name}'")
     def enter_full_name(self, name):
         self.wait.until(es.visibility_of_element_located(self.FULL_NAME_INPUT)).send_keys(name)
 
+    @allure.step("Вводим email: '{email}'")
     def enter_email(self, email):
         self.wait.until(es.visibility_of_element_located(self.EMAIL_INPUT)).send_keys(email)
 
+    @allure.step("Заполняем адреса")
     def fill_addresses(self, current_addr, perm_addr):
         self._send_keys(self.CURRENT_ADDRESS_INPUT, current_addr)
         self._send_keys(self.PERMANENT_ADDRESS_INPUT, perm_addr)
 
+    @allure.step("Нажимаем кнопку Submit")
     def click_submit(self):
         self.wait.until(es.element_to_be_clickable(self.SUBMIT_BUTTON)).click()
 
+    @allure.step("Заполняем форму и отправляем")
     def fill_and_submit(self, name, email, current_addr, perm_addr):
         self.enter_full_name(name)
         self.enter_email(email)
@@ -51,26 +61,31 @@ class TextBoxPage:
         self.click_submit()
         return self
 
+    @allure.step("Получаем имя")
     def get_output_name(self) -> str:
         self.output_wait.until(es.visibility_of_element_located(self.OUTPUT_BLOCK))
         full_text = self.driver.find_element(*self.OUTPUT_NAME).text
         return full_text.replace("Name:", "").strip()
 
+    @allure.step("Получаем email")
     def get_output_email(self) -> str:
         self.output_wait.until(es.visibility_of_element_located(self.OUTPUT_BLOCK))
         full_text = self.driver.find_element(*self.OUTPUT_EMAIL).text
         return full_text.replace("Email:", "").strip()
 
+    @allure.step("Получаем текущий адрес")
     def get_output_current_address(self) -> str:
         self.output_wait.until(es.visibility_of_element_located(self.OUTPUT_BLOCK))
         full_text = self.driver.find_element(*self.OUTPUT_CURRENT_ADDRESS).text
         return full_text.replace("Current Address :", "").strip()
 
+    @allure.step("Получаем постоянный адрес")
     def get_output_permanent_address(self) -> str:
         self.output_wait.until(es.visibility_of_element_located(self.OUTPUT_BLOCK))
         full_text = self.driver.find_element(*self.OUTPUT_PERMANENT_ADDRESS).text
         return full_text.replace("Permananet Address :", "").strip()
 
+    @allure.step("Проверяем видимость блока результата")
     def is_output_visible(self) -> bool:
         try:
             self.output_wait.until(es.visibility_of_element_located(self.OUTPUT_BLOCK))
@@ -78,6 +93,7 @@ class TextBoxPage:
         except TimeoutException:
             return False
 
+    @allure.step("Получаем невалидное имя")
     def get_raw_output_name(self) -> str:
         self.output_wait.until(es.visibility_of_element_located(self.OUTPUT_BLOCK))
         element = self.driver.find_element(*self.OUTPUT_NAME)
